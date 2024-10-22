@@ -1,0 +1,94 @@
+ <Drawer anchor="right" open={drawerOpen} onClose={closeDrawer}>
+        <Stack
+          p={2}
+          width={350}
+          role="presentation"
+          height="100%" // Take full height of the drawer
+          spacing={2}
+          justifyContent="space-between"
+        >
+          <Typography variant="h6" fontWeight="bold">
+            Comments
+          </Typography>
+
+          {/* Scrollable list of comments */}
+          <Box
+            sx={{
+              flexGrow: 1, // Allow the comment list to grow and take remaining space
+              overflowY: "auto", // Enable vertical scrolling
+              maxHeight: "60vh", // Set a maximum height, adjust as needed
+            }}
+          >
+            <List>
+              {comments && comments.length > 0 ? (
+                comments.map((comment, index) => (
+                  <ListItem
+                    key={index}
+                    secondaryAction={
+                      // Conditionally render the edit icon if the current user is the owner of the comment
+                      user_id === comment.user.id ? (
+                        <Stack direction={"row"} spacing={1}>
+                          <IconButton
+                            sx={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "50%",
+                            }}
+                            edge="end"
+                            aria-label="edit"
+                            onClick={() => handleEditComment(comment.id)} // Add edit handler
+                          >
+                            <EditIcon sx={{ fontSize: 16, color: "blue" }} />
+                          </IconButton>
+                          <IconButton
+                            sx={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "50%",
+                            }}
+                            edge="end"
+                            aria-label="edit"
+                            onClick={() => handleDeleteComment(comment.id)} // Add edit handler
+                          >
+                            <DeleteForeverIcon
+                              sx={{ fontSize: 16, color: "blue" }}
+                            />
+                          </IconButton>
+                        </Stack>
+                      ) : null
+                    }
+                  >
+                    <ListItemText
+                      primary={comment.text}
+                      secondary={`by ${comment.user.first_name} ${comment.user.last_name}`}
+                    />
+                  </ListItem>
+                ))
+              ) : (
+                <Typography>No comments yet</Typography>
+              )}
+            </List>
+          </Box>
+
+          {/* Input for new comment */}
+          <Box>
+            <TextField
+              fullWidth
+              placeholder="Add a comment..."
+              variant="standard"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+            />
+
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddComment}
+              disabled={!newComment.trim()}
+              sx={{ mt: 2 }} // Margin top for spacing
+            >
+              Add Comment
+            </Button>
+          </Box>
+        </Stack>
+      </Drawer>

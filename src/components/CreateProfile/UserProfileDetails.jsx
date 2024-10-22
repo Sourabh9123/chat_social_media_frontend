@@ -1,25 +1,31 @@
 import { useEffect, useState } from "react";
-import { Stack, Box, Typography, Divider } from "@mui/material";
+import { Stack, Box, Typography, Divider, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile } from "../../store/ProfileSlice";
+import FollowersModal from "../compo/FollowersModal";
+import FollowingModal from "../compo/FollowingModal";
 
 function UserProfileDetails() {
   const dispatch = useDispatch();
-  //   const [profileData, setProfileData] = useState([]);
   const profileData = useSelector((state) => state.profile.data);
+  const [loading, setLoading] = useState(true);
   const baseURL = "http://localhost:8000";
 
   useEffect(() => {
-    const getUserProfile = async () => {
-      await dispatch(getProfile());
-    };
-    getUserProfile();
-  }, []);
-
-  useEffect(() => {
-    dispatch(getProfile());
-    console.log(profileData);
+    dispatch(getProfile())
+      .unwrap()
+      .then(() => {
+        setLoading(false); // Set loading to false when profile is successfully fetched
+      });
   }, [dispatch]);
+
+  if (loading || !profileData) {
+    return <Typography>Loading...</Typography>; // Show a loading indicator while fetching data
+  }
+
+  const handleTotalPostsClick = () => {
+    console.log("Total Posts button clicked");
+  };
 
   return (
     <div>
@@ -35,7 +41,7 @@ function UserProfileDetails() {
         <Stack width={"40%"} alignItems={"center"}>
           <Box
             component="img"
-            src={`${baseURL}${profileData.profile_picture}`}
+            src={`${baseURL}${profileData?.profile_picture}`}
             alt="avatar"
             sx={{
               width: 250,
@@ -52,163 +58,103 @@ function UserProfileDetails() {
           justifyContent={"center"}
         >
           <Typography
-            justifySelf="center" // This won't work unless it's in a grid or flex container
             fontFamily="sans-serif"
             fontWeight={400}
             fontSize={20}
-            lineHeight={1.5} // Add line height for better readability
-            color="primary.main" // Change the color to a primary theme color
-            textAlign="center" // Center the text
+            lineHeight={1.5}
+            color="primary.main"
+            textAlign="center"
             sx={{
-              margin: "20px", // Add margin around the text
-              padding: "10px", // Add padding for inner spacing
-              border: "1px solid", // Optional: Add a border
-              borderColor: "grey.300", // Optional: Set border color
-              borderRadius: "5px", // Optional: Round the corners
-              backgroundColor: "background.paper", // Optional: Set a background color
-              transition: "0.3s", // Optional: Add a transition for hover effect
+              margin: "20px",
+              padding: "10px",
+              border: "1px solid",
+              borderColor: "grey.300",
+              borderRadius: "5px",
+              backgroundColor: "background.paper",
+              transition: "0.3s",
               "&:hover": {
-                // Optional: Add hover effect
                 backgroundColor: "grey.100",
               },
             }}
           >
-            {profileData.full_name}
+            {profileData?.username}
           </Typography>
+
           <Stack
             width="100%"
             direction="row"
             justifyContent="space-around"
             alignItems="center"
-            spacing={4} // Optional: add spacing between items
+            spacing={4}
             sx={{
-              padding: "20px", // Add padding around the stack
-              backgroundColor: "background.default", // Set a background color
-              borderRadius: "8px", // Round the corners of the stack
-              boxShadow: 1, // Add a subtle shadow
+              padding: "10px",
+              backgroundColor: "background.default",
+              borderRadius: "8px",
+              boxShadow: 1,
             }}
           >
-            <Box
-              sx={{
-                padding: "10px", // Add padding inside the box
-                border: "1px solid", // Add a border
-                borderColor: "grey.300", // Border color
-                borderRadius: "5px", // Round corners of the box
-                textAlign: "center", // Center text inside the box
-                backgroundColor: "background.paper", // Box background color
-                transition: "0.3s", // Transition for hover effect
-                "&:hover": {
-                  // Hover effect
-                  backgroundColor: "grey.100",
-                  transform: "scale(1.05)", // Slight scale on hover
-                },
-              }}
-            >
-              <Typography variant="body1" px={2}>
-                {" "}
-                {profileData.total_post}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                padding: "10px",
-                border: "1px solid",
-                borderColor: "grey.300",
-                borderRadius: "5px",
-                textAlign: "center",
-                backgroundColor: "background.paper",
-                transition: "0.3s",
-                "&:hover": {
-                  backgroundColor: "grey.100",
-                  transform: "scale(1.05)",
-                },
-              }}
-            >
-              <Typography variant="body1">
-                Followers{" "}
+            <Button variant="contained" onClick={handleTotalPostsClick}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "12px",
+                  paddingX: "2px",
+                }}
+              >
+                Posts{" "}
                 <Box
                   component="span"
                   sx={{
-                    color: "primary.main", // Color for the number
-                    fontWeight: "bold", // Bold the number for emphasis
-                    fontSize: "15px", // Increase font size of the number
-                    justifyContent: "center",
+                    fontWeight: "bold",
+                    fontSize: "12px",
                     paddingX: "2px",
                   }}
                 >
-                  {profileData.followers_count}
-                </Box>{" "}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                padding: "10px",
-                border: "1px solid",
-                borderColor: "grey.300",
-                borderRadius: "5px",
-                textAlign: "center",
-                backgroundColor: "background.paper",
-                transition: "0.3s",
-                "&:hover": {
-                  backgroundColor: "grey.100",
-                  transform: "scale(1.05)",
-                },
-              }}
-            >
-              <Typography variant="body1">
-                Following{" "}
-                <Box
-                  component="span"
-                  sx={{
-                    color: "primary.main", // Color for the number
-                    fontWeight: "bold", // Bold the number for emphasis
-                    fontSize: "15px", // Increase font size of the number
-                    justifyContent: "center",
-                    paddingX: "2px",
-                  }}
-                >
-                  {profileData.following_count}
+                  {profileData?.total_post}
                 </Box>
               </Typography>
-            </Box>
-          </Stack>
+            </Button>
 
-          <Box
+            <FollowersModal user_id={profileData?.user} />
+
+            <FollowingModal user_id={profileData?.user} />
+          </Stack>
+          <Stack
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
             sx={{
-              padding: "15px", // Add padding for inner spacing
-              marginTop: "20px", // Space from the previous section
-              border: "1px solid", // Add a border around the bio
-              borderColor: "grey.300", // Set the border color
-              borderRadius: "5px", // Round the corners
-              backgroundColor: "background.paper", // Background matching the theme
-              textAlign: "center", // Center the bio text
-              boxShadow: 1, // Subtle shadow to elevate the bio box
-              transition: "0.3s", // Transition for hover effect
-              "&:hover": {
-                backgroundColor: "grey.100", // Change background color on hover
-                transform: "scale(1.02)", // Slight scale on hover for interaction
-              },
+              padding: 1, // Add padding for better spacing
+              backgroundColor: "background.paper", // Optional background color
+              borderRadius: "8px", // Rounded corners for a modern look
+              boxShadow: 1, // Add shadow for a subtle elevation effect
             }}
           >
             <Typography
-              variant="body1"
-              fontStyle="italic"
-              fontFamily="sans-serif"
+              textAlign="center"
+              variant="body1" // Use a larger, predefined typography variant
+              sx={{
+                fontWeight: 400, // Make the text slightly bolder for readability
+                fontSize: "16px", // Set a custom font size if needed
+                color: "text.primary", // Ensure good contrast with the background
+                lineHeight: 1.7, // Increase line height for better text spacing
+                paddingX: 2, // Add horizontal padding to the text
+              }}
             >
-              A passionate developer who loves building user-friendly interfaces
-              and learning new technologies. This is where the bio content goes.
+              {profileData?.bio}
             </Typography>
-          </Box>
+          </Stack>
         </Stack>
       </Stack>
       <Divider
         sx={{
-          marginY: 2, // Vertical margin (top and bottom)
-          borderColor: "grey.300", // Set the color of the divider line
-          borderWidth: "1px", // Set the thickness of the divider
-          width: "100%", // Make the divider full width
-          borderStyle: "solid", // Ensure solid border style
-          opacity: 0.8, // Optional: Reduce opacity for a softer look
+          marginY: 2,
+          borderColor: "grey.300",
+          borderWidth: "1px",
+          width: "100%",
+          borderStyle: "solid",
+          opacity: 0.8,
         }}
       />
     </div>
@@ -216,3 +162,48 @@ function UserProfileDetails() {
 }
 
 export default UserProfileDetails;
+
+{
+  /* Followers Button */
+}
+{
+  /* <Button variant="contained" onClick={handleFollowersClick}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "10px",
+                  paddingX: "2px",
+                }}
+              > */
+}
+// <FollowersModal user_id={profileData.user} />
+{
+  /* Followers {profileData.followers_count || 0} */
+}
+{
+  /* </Typography>
+              </Button> */
+}
+
+{
+  /* <FollowingModal user_id={profileData.user} /> */
+}
+{
+  /* Following Button */
+}
+{
+  /* <Button variant="contained" onClick={handleFollowingClick}>
+  <Typography
+    variant="body1"
+    sx={{
+      // Primary blue color
+      fontWeight: "bold",
+      fontSize: "11px", // Smaller font size
+      paddingX: "2px",
+    }}
+  >
+    Following {profileData.following_count}{" "}
+  </Typography>
+</Button> */
+}

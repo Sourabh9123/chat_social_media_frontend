@@ -11,6 +11,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import EditComment from "./CommentEdit";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentOutlinedIcon from "@mui/icons-material/CommentOutlined";
@@ -28,6 +29,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import BookmarkAddedIcon from "@mui/icons-material/BookmarkAdded";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import CommentDrawer from "./CommentDrawer";
 
 function ActionButtons({
   total_likes,
@@ -195,6 +197,13 @@ function ActionButtons({
       </Stack>
 
       {/* Drawer for comments */}
+
+      {/* <CommentDrawer
+         drawerOpen={drawerOpen}
+        closeDrawer={closeDrawer}
+        post_id={post_id}
+      /> */}
+
       <Drawer anchor="right" open={drawerOpen} onClose={closeDrawer}>
         <Stack
           p={2}
@@ -225,7 +234,7 @@ function ActionButtons({
                       // Conditionally render the edit icon if the current user is the owner of the comment
                       user_id === comment.user.id ? (
                         <Stack direction={"row"} spacing={1}>
-                          <IconButton
+                          {/* <IconButton
                             sx={{
                               width: "20px",
                               height: "20px",
@@ -236,7 +245,11 @@ function ActionButtons({
                             onClick={() => handleEditComment(comment.id)} // Add edit handler
                           >
                             <EditIcon sx={{ fontSize: 16, color: "blue" }} />
-                          </IconButton>
+                          </IconButton> */}
+                          <EditComment
+                            commentId={comment.id}
+                            commentText={comment.text}
+                          />
                           <IconButton
                             sx={{
                               width: "20px",

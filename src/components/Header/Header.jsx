@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Stack,
   Typography,
@@ -16,8 +16,14 @@ import ChatIcon from "@mui/icons-material/Chat";
 import Container from "@mui/material/Container";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Header() {
+  const profile_picture_url = useSelector(
+    (state) => state.auth.profile_picture
+  );
+  const profile_picture = `http://localhost:8000/media/${profile_picture_url}`;
+
   const navigate = useNavigate();
   const handleprofileClick = () => {
     navigate("/profile");
@@ -58,7 +64,7 @@ function Header() {
         >
           <Box
             component="img"
-            src="avtar.jpg"
+            src={profile_picture}
             alt="avatar"
             sx={{
               width: 40,
