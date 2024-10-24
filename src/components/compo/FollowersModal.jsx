@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { getAllFollowers } from "../../store/userRelatedSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { removefollower } from "../../store/FollowSlice";
 
 const FollowersModal = ({ user_id }) => {
   const baseURL = "http://localhost:8000/media/";
@@ -22,7 +23,14 @@ const FollowersModal = ({ user_id }) => {
   useEffect(() => {
     dispatch(getAllFollowers(user_id)); // will get info of user followers
     console.log(data);
-  }, [dispatch]);
+  }, [dispatch, user_id]);
+
+  const handleRemoveFollower = async (id) => {
+    const user_id = id;
+    const res = await dispatch(removefollower(user_id));
+    // dispatch(getAllFollowers(user_id));
+    console.log(res);
+  };
 
   const [open, setOpen] = useState(false);
 
@@ -92,7 +100,7 @@ const FollowersModal = ({ user_id }) => {
                         paddingX: "4px", // Reduce horizontal padding (left and right)
                         minWidth: "50px", // Set a minimum width to control button size
                       }} // Adds some left margin for spacing
-                      onClick={() => console.log(follower.id)}
+                      onClick={() => handleRemoveFollower(follower.id)}
                     >
                       Remove
                     </Button>

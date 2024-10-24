@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { getAllFollowers } from "../../store/userRelatedSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { unFollow } from "../../store/FollowSlice";
 
 function FollowingModal({ user_id }) {
   const baseURL = "http://localhost:8000/media/";
@@ -23,6 +24,11 @@ function FollowingModal({ user_id }) {
     dispatch(getAllFollowers(user_id)); // will get info of user followers
     console.log(data);
   }, [dispatch]);
+
+  const handleUnfollow = async (id) => {
+    const res = await dispatch(unFollow(id));
+    console.log(res);
+  };
 
   const [open, setOpen] = useState(false);
 
@@ -89,7 +95,7 @@ function FollowingModal({ user_id }) {
                         paddingX: "4px", // Reduce horizontal padding (left and right)
                         minWidth: "65px", // Set a minimum width to control button size
                       }} // Adds some left margin for spacing
-                      onClick={() => console.log(follower.id)}
+                      onClick={() => handleUnfollow(follower.id)}
                     >
                       unfollow
                     </Button>

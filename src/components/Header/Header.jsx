@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Stack,
   Typography,
@@ -16,9 +16,32 @@ import ChatIcon from "@mui/icons-material/Chat";
 import Container from "@mui/material/Container";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getSuggestion, setSearchTerm } from "../../store/suggestionSlice";
 
 function Header() {
+  const [search, setSearch] = useState("");
+  const dispatch = useDispatch();
+
+  const callSearch = () => {
+    dispatch(setSearchTerm(search));
+    dispatch(getSuggestion({ page_no: 1, searchTerm: search }));
+  };
+
+  const handleSearchClick = () => {
+    if (search !== " ") {
+      callSearch();
+    }
+  };
+
+  const handleSearchProfile = (e) => {
+    if (e.key === "Enter") {
+      if (search !== " ") {
+        callSearch();
+      }
+    }
+  };
+
   const profile_picture_url = useSelector(
     (state) => state.auth.profile_picture
   );
@@ -90,7 +113,8 @@ function Header() {
           size="small"
           color="primary"
           label="Search here..."
-          onChange={(e) => console.log(e.target.value)}
+          onChange={(e) => setSearch(() => e.target.value)}
+          onKeyDown={handleSearchProfile}
           // variant="standard"
           InputProps={{
             endAdornment: (
@@ -98,7 +122,7 @@ function Header() {
                 <IconButton
                   aria-label="Search"
                   color="primary"
-                  onClick={() => console.log(" search clicked")}
+                  onClick={handleSearchClick}
                 >
                   <SearchIcon />
                 </IconButton>

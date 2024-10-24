@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
+import axios from "axios";
 const initialState = {
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   is_error: null,
   followers: [],
   following: [],
+  response: [],
 };
 
 export const getFollowers = createAsyncThunk(
@@ -13,6 +14,7 @@ export const getFollowers = createAsyncThunk(
     console.log(user_id);
     const state = getState();
     const token = state.auth.access_token;
+
     const url = `http://127.0.0.1:8000/api/profile/follow/${user_id}/?type=followers`;
     const headers = {
       "Content-Type": "application/json",
@@ -52,19 +54,68 @@ export const getFollowing = createAsyncThunk(
 );
 
 // example data { user_id : "uuid"}
-const followUser = createAsyncThunk(
+export const followUser = createAsyncThunk(
   "followUser",
-  async (data, { getState }) => {
-    console.log(data);
+  async (user_id, { getState }) => {
+    console.log(user_id);
+    const data = { user_id: user_id };
     const state = getState();
     const token = state.auth.access_token;
-    const url = `http://127.0.0.1:8000/api/profile/follow/${user_id}/`;
+    const my_user_id = state.auth.user_id;
+    const url = `http://127.0.0.1:8000/api/profile/follow/${my_user_id}/`;
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     };
     try {
       const response = await axios.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+//  removefollower mine
+
+export const removefollower = createAsyncThunk(
+  "removefollower",
+  async (user_id, { getState, rejectWithValue }) => {
+    console.log(user_id);
+
+    const state = getState();
+    const token = state.auth.access_token;
+    const url = `http://127.0.0.1:8000/api/profile/remove/follower/${user_id}/`;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const response = await axios.delete(url, { headers });
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+export const unFollow = createAsyncThunk(
+  "unFollow",
+  async (user_id, { getState, rejectWithValue }) => {
+    console.log(user_id);
+
+    const state = getState();
+    const token = state.auth.access_token;
+    const url = `http://127.0.0.1:8000/api/profile/unfollow/${user_id}/`;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const response = await axios.delete(url, { headers });
+
+      return response.data;
     } catch (error) {
       console.log(error);
     }
@@ -97,6 +148,30 @@ const followSlice = createSlice({
       state.following = action.payload;
     });
     builder.addCase(getFollowing.rejected, (state, action) => {
+      state.status = "error";
+      state.is_error = true;
+    });
+    builder.addCase(followUser.pending, (state, action) => {
+      state.is_error = false;
+      state.status = "pending";
+    });
+    builder.addCase(followUser.fulfilled, (state, action) => {
+      state.status = "success";
+      state.response = action.payload;
+    });
+    builder.addCase(followUser.rejected, (state, action) => {
+      state.status = "error";
+      state.is_error = true;
+    });
+    builder.addCase(removefollower.pending, (state, action) => {
+      state.is_error = false;
+      state.status = "pending";
+    });
+    builder.addCase(removefollower.fulfilled, (state, action) => {
+      state.status = "success";
+      state.response = action.payload;
+    });
+    builder.addCase(removefollower.rejected, (state, action) => {
       state.status = "error";
       state.is_error = true;
     });

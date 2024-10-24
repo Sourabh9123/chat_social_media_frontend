@@ -3,8 +3,9 @@ import { faker } from "@faker-js/faker";
 
 import FormattedDate from "../compo/DateFormate";
 
-function AvatarSection({ name, created_at }) {
+function AvatarSection({ name, created_at, img }) {
   // console.log("avatar", name, created_at);
+  const baseURL = "http://localhost:8000/media/";
   return (
     <Stack
       direction={"row"}
@@ -27,7 +28,7 @@ function AvatarSection({ name, created_at }) {
             height: 40,
           }}
         >
-          <Avatar src={faker.image.avatar()} />
+          <Avatar src={`${baseURL}${img}`} />
         </IconButton>
 
         <Typography

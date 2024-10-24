@@ -4,6 +4,8 @@ import PostSlice from "./PostSlice";
 import ProfileSlice from "./ProfileSlice";
 import userRelatedSlice from "./userRelatedSlice";
 import PostCommentsSlice from "./PostCommentSlice";
+import FollowSlice from "./FollowSlice";
+import suggestionSlice from "./suggestionSlice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ const store = configureStore({
     profile: ProfileSlice,
     comment: PostCommentsSlice,
     userRelated: userRelatedSlice,
+    follow: FollowSlice,
+    suggestion: suggestionSlice,
   },
 });
 
