@@ -46,7 +46,8 @@ function CommentDrawer({ drawerOpen, closeDrawer, post_id }) {
   const handleDeleteComment = async (id) => {
     const response = await dispatch(DeleteComment(id));
     if (response.payload.status === 204) {
-      dispatch(fetchPost(post_id)); // Refresh comments after delete
+      // dispatch(fetchPost(post_id)); // Refresh comments after delete
+      dispatch(getAllComment(post_id));
     } else {
       // Handle delete error
       console.error("Failed to delete comment");
@@ -58,7 +59,8 @@ function CommentDrawer({ drawerOpen, closeDrawer, post_id }) {
       const comment_data = { text: newComment };
       const response = await dispatch(createComment({ comment_data, post_id }));
       if (response.payload) {
-        dispatch(fetchPost(post_id)); // Refresh comments after adding a comment
+        // dispatch(fetchPost(post_id)); // Refresh comments after adding a comment
+        dispatch(getAllComment(post_id));
         setNewComment(""); // Clear input after submitting
       } else {
         // Handle add error

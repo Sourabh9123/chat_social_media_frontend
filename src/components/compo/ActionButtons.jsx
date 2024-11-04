@@ -30,6 +30,7 @@ import BookmarkAddedIcon from "@mui/icons-material/BookmarkAdded";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import CommentDrawer from "./CommentDrawer";
+import { getAllComment } from "../../store/PostCommentSlice";
 
 function ActionButtons({
   total_likes,
@@ -42,6 +43,8 @@ function ActionButtons({
 }) {
   const user_id = useSelector((state) => state.auth.user_id);
   const dispatch = useDispatch();
+  // const comments = useSelector((state) => state.comment.data);
+  // console.log("comments------------------------------", post_id);
 
   const [bgColor, setBgColor] = useState("transparent");
   const [isLiked, setIsLiked] = useState(false);
@@ -104,11 +107,21 @@ function ActionButtons({
   };
 
   useEffect(() => {
+    // const run = async () => {
+    //   console.log(post_id);
+    //   const res = await getAllComment(post_id);
+    //   console.log(
+    //     res,
+    //     " getAllcomments ______________________________________________-----------"
+    //   );
+    // };
+    // run();
+
     const likedByCurrentUser = liked_by.some(
       (item) => item.user.id === user_id
     );
     setIsLiked(likedByCurrentUser); // Set initial like state
-  }, [liked_by, user_id]);
+  }, [liked_by, user_id, post_id]);
 
   return (
     <>
@@ -270,7 +283,7 @@ function ActionButtons({
                   >
                     <ListItemText
                       primary={comment.text}
-                      secondary={`by ${comment.user.first_name} ${comment.user.last_name}`}
+                      secondary={`by ${comment.user.username}`}
                     />
                   </ListItem>
                 ))

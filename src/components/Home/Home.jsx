@@ -19,7 +19,7 @@ function Home() {
       const res = await dispatch(
         getSuggestion({ page_no: 1, searchTerm: null })
       );
-      console.log({ suggestions, count, next, previous }, "res of sugg");
+      // console.log({ suggestions, count, next, previous }, "res of sugg");
     };
     getProfileSuggestions();
   }, [dispatch]);

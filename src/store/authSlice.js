@@ -11,6 +11,17 @@ const initialState = {
   is_error: null,
 };
 
+export const createUser = createAsyncThunk("createUser", async (data) => {
+  try {
+    const url = "http://127.0.0.1:8000/auth/signup/";
+    const response = await axios.post(url, data);
+    // console.log(response.data, "user created ----------------------- ");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 export const LoginUser = createAsyncThunk("LoginUser", async (data) => {
   try {
     const url = "http://127.0.0.1:8000/auth/login/";
@@ -54,6 +65,22 @@ const authSlice = createSlice({
       state.profile_picture = action.payload.user_data.profile_picture;
     });
     builder.addCase(LoginUser.rejected, (state, action) => {
+      state.status = "error";
+      state.is_error = true;
+    });
+    builder.addCase(createUser.pending, (state, action) => {
+      state.is_error = false;
+      state.status = "pending";
+    });
+    builder.addCase(createUser.fulfilled, (state, action) => {
+      state.status = "success";
+      state.access_token = action.payload.token.access;
+      state.refresh_token = action.payload.token.refresh;
+      state.username = action.payload.data.username;
+      state.user_id = action.payload.data.id;
+      state.profile_picture = action.payload.data.profile_picture;
+    });
+    builder.addCase(createUser.rejected, (state, action) => {
       state.status = "error";
       state.is_error = true;
     });

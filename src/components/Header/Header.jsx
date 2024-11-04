@@ -22,14 +22,17 @@ import { getSuggestion, setSearchTerm } from "../../store/suggestionSlice";
 function Header() {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const callSearch = () => {
     dispatch(setSearchTerm(search));
     dispatch(getSuggestion({ page_no: 1, searchTerm: search }));
+    setSearch("");
   };
 
   const handleSearchClick = () => {
     if (search !== " ") {
+      navigate("/");
       callSearch();
     }
   };
@@ -37,6 +40,7 @@ function Header() {
   const handleSearchProfile = (e) => {
     if (e.key === "Enter") {
       if (search !== " ") {
+        navigate("/");
         callSearch();
       }
     }
@@ -47,7 +51,6 @@ function Header() {
   );
   const profile_picture = `http://localhost:8000/media/${profile_picture_url}`;
 
-  const navigate = useNavigate();
   const handleprofileClick = () => {
     navigate("/profile");
     console.log("profile clicked");
@@ -115,6 +118,7 @@ function Header() {
           label="Search here..."
           onChange={(e) => setSearch(() => e.target.value)}
           onKeyDown={handleSearchProfile}
+          value={search}
           // variant="standard"
           InputProps={{
             endAdornment: (

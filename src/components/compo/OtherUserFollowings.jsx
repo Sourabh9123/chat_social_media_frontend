@@ -13,28 +13,73 @@ import {
 } from "@mui/material";
 import { getAllFollowers } from "../../store/userRelatedSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { unFollow } from "../../store/FollowSlice";
+import { unFollow, followUser } from "../../store/FollowSlice";
+import { getOtherFollowings } from "../../store/ProfileSlice";
+import { getFollowing } from "../../store/FollowSlice";
+import { useNavigate } from "react-router-dom";
 
-function FollowingModal({ user_id }) {
+function OtherUserFollowings({ user_id }) {
+  const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.auth.user_id);
   const baseURL = "http://localhost:8000/media/";
   const dispatch = useDispatch();
-  const following = useSelector((state) => state.userRelated.following);
+  const followings = useSelector((state) => state.profile.otherFollowings);
   const data = useSelector((state) => state.userRelated.data);
+  const following_counts = useSelector(
+    (state) => state.follow.following_counts
+  );
   useEffect(() => {
-    dispatch(getAllFollowers(user_id)); // will get info of user followers
-    // console.log(data);
-  }, [dispatch]);
+    const get_others_followings = async () => {
+      const numbers = await dispatch(getFollowing(user_id));
+      console.log(numbers, "------------------------- numbers of followings");
 
-  const handleUnfollow = async (id) => {
-    const res = await dispatch(unFollow(id));
-    dispatch(getAllFollowers(user_id));
-    console.log(res);
-  };
+      const res = await dispatch(getOtherFollowings(user_id));
+      console.log(res);
+    };
+    get_others_followings();
+    // will get info of user followers
+    // console.log(data);
+  }, [dispatch, user_id]);
+  console.log(followings, "followings");
 
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const followOrUnfollowUser = async (
+    user_to_follow_id,
+    alerdy_follow,
+    isMyProfile
+  ) => {
+    // console.log({ user_to_follow_id, alerdy_follow, isMyProfile });
+    if (isMyProfile) {
+      navigate("/profile");
+    }
+    if (alerdy_follow) {
+      //unfollw
+      console.log(
+        "is followd by user is true",
+        user_to_follow_id,
+        alerdy_follow,
+        user_id
+      );
+      const res = await dispatch(unFollow(user_to_follow_id));
+      dispatch(getOtherFollowings(user_id));
+      console.log(res, "unfollowed user");
+    } else {
+      const res = await dispatch(followUser(user_to_follow_id));
+      console.log(res, "followed user");
+      dispatch(getOtherFollowings(user_id));
+      console.log(
+        "is followd by user is False",
+        user_to_follow_id,
+        user_id,
+        alerdy_follow
+      );
+      //follw user with this id user_to_follow_id
+    }
+  };
 
   return (
     <div>
@@ -48,7 +93,7 @@ function FollowingModal({ user_id }) {
           fontSize: "10px", // Smaller font size
         }}
       >
-        Following {data.following_count || 0}
+        Following {following_counts || 0}
       </Button>
 
       {/* Modal for displaying followers */}
@@ -74,8 +119,8 @@ function FollowingModal({ user_id }) {
 
           {/* List of followers */}
           <List>
-            {following && following.length > 0 ? (
-              following.map((follower) => (
+            {followings && followings.length > 0 ? (
+              followings.map((follower) => (
                 <ListItem key={follower.id}>
                   <ListItemAvatar>
                     <Avatar
@@ -83,7 +128,7 @@ function FollowingModal({ user_id }) {
                       alt={follower.first_name}
                     />
                   </ListItemAvatar>
-                  <ListItemText primary={follower.username} />
+                  <ListItemText primary={follower.following} />
                   <Stack width={"40px"}>
                     {" "}
                     <Button
@@ -96,9 +141,20 @@ function FollowingModal({ user_id }) {
                         paddingX: "4px", // Reduce horizontal padding (left and right)
                         minWidth: "65px", // Set a minimum width to control button size
                       }} // Adds some left margin for spacing
-                      onClick={() => handleUnfollow(follower.id)}
+                      onClick={() =>
+                        followOrUnfollowUser(
+                          follower.user_id,
+                          follower.is_followed_by_current_user,
+                          currentUser === follower.user_id //this is say is my profile
+                        )
+                      }
                     >
-                      unfollow
+                      {/* unfollow */}
+                      {currentUser === follower.user_id
+                        ? "view"
+                        : follower.is_followed_by_current_user
+                        ? "Unfollow"
+                        : "Follow"}
                     </Button>
                   </Stack>
                 </ListItem>
@@ -118,4 +174,4 @@ function FollowingModal({ user_id }) {
   );
 }
 
-export default FollowingModal;
+export default OtherUserFollowings;

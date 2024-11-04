@@ -54,7 +54,7 @@ const suggestionSlice = createSlice({
     });
     builder.addCase(getSuggestion.fulfilled, (state, action) => {
       state.status = "success";
-      console.log(action.payload);
+      // console.log(action.payload);
 
       state.suggestions = action.payload.results;
       state.count = Math.ceil(action.payload.count / 5); // dividing with total number of content a have

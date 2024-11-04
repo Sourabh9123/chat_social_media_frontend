@@ -114,7 +114,7 @@ export const fetchPost = createAsyncThunk(
     };
     try {
       const response = await axios.get(url, { headers });
-      console.log(response);
+      // console.log(response);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -134,7 +134,7 @@ const PostSlice = createSlice({
     builder.addCase(fetchPost.fulfilled, (state, action) => {
       state.status = "success";
       state.posts = action.payload.data;
-      console.log(state.posts, "from post init");
+      // console.log(state.posts, "from post init");
     });
     builder.addCase(fetchPost.rejected, (state, action) => {
       (state.is_error = true), (state.error_message = action.error);

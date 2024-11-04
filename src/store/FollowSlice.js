@@ -4,7 +4,9 @@ const initialState = {
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   is_error: null,
   followers: [],
+  followers_counts: null,
   following: [],
+  following_counts: null,
   response: [],
 };
 
@@ -23,6 +25,7 @@ export const getFollowers = createAsyncThunk(
     try {
       const response = await axios.get(url, { headers }); // Use axios.post instead of axios.Post
       // return { data: response.data, statusCode: response.status };
+      console.log(response.data, "----------------- followers");
       return response.data;
     } catch (error) {
       console.error(error);
@@ -71,7 +74,10 @@ export const followUser = createAsyncThunk(
       const response = await axios.post(url, data, { headers });
       return response.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      return rejectWithValue(
+        error.response ? error.response.data : "Network error"
+      );
     }
   }
 );
@@ -95,15 +101,17 @@ export const removefollower = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      return rejectWithValue(
+        error.response ? error.response.data : "Network error"
+      );
     }
   }
 );
-
 export const unFollow = createAsyncThunk(
   "unFollow",
   async (user_id, { getState, rejectWithValue }) => {
-    console.log(user_id);
+    console.log(user_id, "follow slice");
 
     const state = getState();
     const token = state.auth.access_token;
@@ -114,10 +122,12 @@ export const unFollow = createAsyncThunk(
     };
     try {
       const response = await axios.delete(url, { headers });
-
       return response.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      return rejectWithValue(
+        error.response ? error.response.data : "Network error"
+      );
     }
   }
 );
@@ -133,6 +143,8 @@ const followSlice = createSlice({
     });
     builder.addCase(getFollowers.fulfilled, (state, action) => {
       state.status = "success";
+      state.followers_counts = action.payload.length || 0;
+      console.log("count followers ", state.followers_counts);
       state.followers = action.payload;
     });
     builder.addCase(getFollowers.rejected, (state, action) => {
@@ -146,6 +158,8 @@ const followSlice = createSlice({
     builder.addCase(getFollowing.fulfilled, (state, action) => {
       state.status = "success";
       state.following = action.payload;
+      state.following_counts = action.payload.length || 0;
+      console.log("count followings ", state.following_counts);
     });
     builder.addCase(getFollowing.rejected, (state, action) => {
       state.status = "error";
@@ -172,6 +186,19 @@ const followSlice = createSlice({
       state.response = action.payload;
     });
     builder.addCase(removefollower.rejected, (state, action) => {
+      state.status = "error";
+      state.is_error = true;
+    });
+    builder.addCase(unFollow.pending, (state, action) => {
+      state.is_error = false;
+      state.status = "pending";
+    });
+    builder.addCase(unFollow.fulfilled, (state, action) => {
+      state.status = "success";
+      state.response = action.payload;
+      console.log(action, "unfollow slice ");
+    });
+    builder.addCase(unFollow.rejected, (state, action) => {
       state.status = "error";
       state.is_error = true;
     });

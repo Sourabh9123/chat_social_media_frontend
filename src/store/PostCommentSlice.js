@@ -25,31 +25,33 @@ export const DeleteComment = createAsyncThunk(
     }
   }
 );
-
 export const getAllComment = createAsyncThunk(
   "getAllComment",
+  async (post_id, { getState, rejectWithValue }) => {
+    console.log("Inside thunk of getAllComment");
+    console.log("Thunk post id:", post_id);
 
-  async (post_id, { getState }) => {
-    console.log("inside thunk of get all comments");
-    console.log("thunk post id", post_id);
     const state = getState();
     const token = state.auth.access_token;
     const url = `http://localhost:8000/post/comment/${post_id}/`;
+
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     };
+
     try {
-      const response = await axios.get(url, { headers }); // Use axios.post instead of axios.Post
-      // return { data: response.data, statusCode: response.status };
+      const response = await axios.get(url, { headers });
+      console.log(response.data, "Data fetched in thunk");
       return response.data;
     } catch (error) {
-      console.error(error);
-      return rejectWithValue(error.response.data); // Use rejectWithValue to return errors
+      console.error("Error fetching comments:", error);
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch comments"
+      );
     }
   }
 );
-
 export const editComment = createAsyncThunk(
   "comment/editComment",
   async ({ comment_data, comment_id }, { getState, rejectWithValue }) => {

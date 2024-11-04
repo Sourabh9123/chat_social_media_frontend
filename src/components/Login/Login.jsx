@@ -3,6 +3,7 @@ import style from "./Login.module.css";
 import { useDispatch } from "react-redux";
 import { setUser, LoginUser } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
+import { Stack, Typography, Button } from "@mui/material";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -15,33 +16,13 @@ function Login() {
     console.log("Email:", email);
     console.log("Password:", password);
     const res = await dispatch(LoginUser({ email, password }));
-    // console.log(res.payload);
     if (res) {
-      // const { access, refresh } = res.payload.token;
-      // const access_token = "";
-      // const refresh_token = "";
-      // console.log(access, refresh);
-      // const first_name = res.payload.user_data.first_name;
-      // const last_name = res.payload.user_data.last_name;
-      // const user_name = first_name + " " + last_name;
-      // const user_id = res.payload.user_data.id;
-      // const profile_picture = res.payload.user_data.profile_picture;
-
-      // dispatch(
-      //   setUser({
-      //     access_token: access,
-      //     refresh_token: refresh,
-      //     user_name: user_name,
-      //     user_id: user_id,
-      //     profile_picture: profile_picture,
-      //   })
-      // );
-
       navigate("/");
     }
+  };
 
-    // Add logic for handling login or form submission here
-    // dispatch(setUser)
+  const SignupRedirect = () => {
+    navigate("/signup");
   };
 
   return (
@@ -65,7 +46,20 @@ function Login() {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit"> Sign In</button>
+        <Stack
+          direction={"row"}
+          // justifyContent={"center"}
+          // alignItems={"center"}
+          spacing={1}
+        >
+          <Typography fontSize={"10px"} color="primary">
+            Don't Have An Account Create One {"-->"}
+          </Typography>
+          <Button variant="contained" size="small" onClick={SignupRedirect}>
+            Sign Up
+          </Button>
+        </Stack>
       </form>
     </div>
   );

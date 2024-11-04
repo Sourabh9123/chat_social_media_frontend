@@ -14,6 +14,8 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePosts from "./components/CreateProfile/ProfilePosts";
+import SignUp from "./components/signUp/SignUp";
+import OtherUserProfile from "./components/CreateProfile/OtherUserProfile";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,6 +38,14 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile/other"
+          element={
+            <ProtectedRoute>
+              <OtherUserProfile />
+            </ProtectedRoute>
+          }
+        />
 
         {/* <Route path="/chat" element={<Chat />} /> */}
 
@@ -51,6 +61,7 @@ const router = createBrowserRouter(
         /> */}
 
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
       </Route>
     </>
   )

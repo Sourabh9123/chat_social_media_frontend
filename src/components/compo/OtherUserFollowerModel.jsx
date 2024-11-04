@@ -1,3 +1,5 @@
+// this is use for both followers and following because it is not related to current user
+
 import React, { useEffect, useState } from "react";
 import {
   Button,
@@ -11,23 +13,27 @@ import {
   Stack,
   ListItemText,
 } from "@mui/material";
-import { getAllFollowers } from "../../store/userRelatedSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { removefollower } from "../../store/FollowSlice";
-import { getFollowers } from "../../store/FollowSlice";
-import { getOthersFollowers } from "../../store/ProfileSlice";
 
-const FollowersModal = ({ user_id }) => {
+import { useDispatch, useSelector } from "react-redux";
+
+import { getOthersFollowers } from "../../store/ProfileSlice";
+import { useNavigate } from "react-router-dom";
+
+import { unFollow, followUser } from "../../store/FollowSlice";
+import { getFollowers } from "../../store/FollowSlice";
+
+///
+//
+//// this is use for both followers and following because it is not related to current user
+
+const OtherUserFollowerModel = ({ user_id }) => {
+  const currentUser = useSelector((state) => state.auth.user_id);
+  const navigate = useNavigate();
   const baseURL = "http://localhost:8000/media/";
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.auth.user_id);
-
   const followers = useSelector((state) => state.profile.otherFollowers);
   const follower_counts = useSelector((state) => state.follow.followers_counts);
   const data = useSelector((state) => state.userRelated.data);
-
-  // const followers = useSelector((state) => state.userRelated.followers);
-  // const follower_counts = useSelector((state) => state.follow.followers_counts);
 
   useEffect(() => {
     const get_others_followers = async () => {
@@ -36,20 +42,46 @@ const FollowersModal = ({ user_id }) => {
       console.log(res);
     };
     get_others_followers();
+
+    // dispatch(getOtherFollowings(user_id)); // will get info of user followings
+
+    // console.log(data);
   }, [dispatch, user_id]);
   console.log(followers, "followers others ");
 
-  const handleRemoveFollower = async (id) => {
-    const user_id = id;
-    const res = await dispatch(removefollower(user_id));
-    dispatch(getOthersFollowers(currentUser));
-    console.log(res);
+  const followOrUnfollowUser = async (
+    user_to_follow_id,
+    alerdy_follow,
+    isMyProfile
+  ) => {
+    if (isMyProfile) {
+      navigate("/profile");
+    }
+    if (alerdy_follow) {
+      //unfollw
+      console.log(
+        "is followd by user is true",
+        user_to_follow_id,
+        alerdy_follow,
+        user_id
+      );
+      const res = await dispatch(unFollow(user_to_follow_id));
+      dispatch(getOthersFollowers(user_id));
+      console.log(res, "unfollowed user");
+    } else {
+      followUser;
+      const res = await dispatch(followUser(user_to_follow_id));
+      console.log(res, "followed user");
+      dispatch(getOthersFollowers(user_id));
+      console.log(
+        "is followd by user is False",
+        user_to_follow_id,
+        user_id,
+        alerdy_follow
+      );
+      //follw user with this id user_to_follow_id
+    }
   };
-  console.log(
-    follower_counts,
-    user_id,
-    " -----------------------------------------------followers"
-  );
 
   const [open, setOpen] = useState(false);
 
@@ -70,7 +102,6 @@ const FollowersModal = ({ user_id }) => {
       >
         Followers {follower_counts || 0}
       </Button>
-      {/* {data.followers_count || 0} */}
 
       {/* Modal for displaying followers */}
       <Modal open={open} onClose={handleClose}>
@@ -106,9 +137,11 @@ const FollowersModal = ({ user_id }) => {
                   </ListItemAvatar>
                   <ListItemText
                     // primary={follower.first_name + " " + follower.last_name}
+                    // primary={follower.username}
+
                     primary={follower.follower}
                   />
-                  <Stack width={"30px"}>
+                  <Stack width={"50px"}>
                     {" "}
                     <Button
                       variant="contained"
@@ -118,11 +151,22 @@ const FollowersModal = ({ user_id }) => {
                         ml: 2, // Adds some left margin for spacing
                         fontSize: "10px", // Smaller font size
                         paddingX: "4px", // Reduce horizontal padding (left and right)
-                        minWidth: "50px", // Set a minimum width to control button size
+                        paddingY: "5px",
+                        minWidth: "70px", // Set a minimum width to control button size
                       }} // Adds some left margin for spacing
-                      onClick={() => handleRemoveFollower(follower.user_id)}
+                      onClick={() =>
+                        followOrUnfollowUser(
+                          follower.user_id,
+                          follower.is_followed_by_current_user,
+                          currentUser === follower.user_id //this is say is my profile
+                        )
+                      }
                     >
-                      Remove
+                      {currentUser === follower.user_id
+                        ? "view"
+                        : follower.is_followed_by_current_user
+                        ? "Unfollow"
+                        : "Follow"}
                     </Button>
                   </Stack>
                 </ListItem>
@@ -142,4 +186,4 @@ const FollowersModal = ({ user_id }) => {
   );
 };
 
-export default FollowersModal;
+export default OtherUserFollowerModel;
