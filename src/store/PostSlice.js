@@ -6,6 +6,8 @@ const initialState = {
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   is_error: null,
   posts: [],
+  next: "",
+  getPostPictures: [],
 };
 
 export const savedPost = createAsyncThunk(
@@ -104,10 +106,15 @@ export const DeleteComment = createAsyncThunk(
 
 export const fetchPost = createAsyncThunk(
   "fetchPost",
-  async (_, { getState }) => {
+  async (url, { getState }) => {
     const state = getState();
     const token = state.auth.access_token;
-    const url = "http://localhost:8000/post/";
+
+    // let url = "http://localhost:8000/post/";
+    // if (next !== "") {
+    //   console.log("next --- urls", state.next);
+    // }
+
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -121,11 +128,49 @@ export const fetchPost = createAsyncThunk(
     }
   }
 );
+export const getPostPictures = createAsyncThunk(
+  "getPostPictures",
+  async (_, { getState }) => {
+    const url = "";
+    const state = getState();
+    const token = state.auth.access_token;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const response = axios.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 
 const PostSlice = createSlice({
   name: "PostSlice",
   initialState,
-  reducers: {},
+  reducers: {
+    cleanOldPosts: (state) => {
+      state.posts = [];
+    },
+    decreaseNoOfComments: (state, action) => {
+      const { post_id } = action.payload;
+      const post = state.posts.find((p) => p.id === post_id);
+      if (post && post.total_comments > 0) {
+        post.total_comments = post.total_comments - 1;
+        // console.log("total comments------------------", post.total_comments);
+      }
+    },
+    increaseNoOfComments: (state, action) => {
+      const { post_id } = action.payload;
+      const post = state.posts.find((p) => p.id === post_id);
+      if (post && post.total_comments) {
+        post.total_comments = post.total_comments + 1;
+        // console.log("total comments------------------", post.total_comments);
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchPost.pending, (state, action) => {
       state.is_error = false;
@@ -133,7 +178,10 @@ const PostSlice = createSlice({
     });
     builder.addCase(fetchPost.fulfilled, (state, action) => {
       state.status = "success";
-      state.posts = action.payload.data;
+      console.log("post after paginate", action.payload.results);
+      state.posts = [...state.posts, ...action.payload.results];
+      // state.posts = action.payload.results;
+      state.next = action.payload.next;
       // console.log(state.posts, "from post init");
     });
     builder.addCase(fetchPost.rejected, (state, action) => {
@@ -151,7 +199,22 @@ const PostSlice = createSlice({
       (state.is_error = true), (state.error_message = action.error);
       state.status = "error";
     });
+    builder.addCase(getPostPictures.pending, (state, action) => {
+      state.is_error = false;
+      state.status = "pending";
+    });
+    builder.addCase(getPostPictures.fulfilled, (state, action) => {
+      state.status = "success";
+      state.getPostPictures = action.payload;
+    });
+    builder.addCase(getPostPictures.rejected, (state, action) => {
+      (state.is_error = true), (state.error_message = action.error);
+      state.status = "error";
+    });
   },
 });
 
 export default PostSlice.reducer;
+
+export const { cleanOldPosts, decreaseNoOfComments, increaseNoOfComments } =
+  PostSlice.actions;

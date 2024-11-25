@@ -1,11 +1,17 @@
 import { Stack, Typography, Avatar, IconButton } from "@mui/material";
 import { faker } from "@faker-js/faker";
+import { useNavigate } from "react-router-dom";
 
 import FormattedDate from "../compo/DateFormate";
 
-function AvatarSection({ name, created_at, img }) {
+function AvatarSection({ name, created_at, img, id }) {
   // console.log("avatar", name, created_at);
   const baseURL = "http://localhost:8000/media/";
+  const navigate = useNavigate();
+
+  const redirectToProfile = (user_id) => {
+    navigate("/profile/other", { state: { user_id } });
+  };
   return (
     <Stack
       direction={"row"}
@@ -28,7 +34,10 @@ function AvatarSection({ name, created_at, img }) {
             height: 40,
           }}
         >
-          <Avatar src={`${baseURL}${img}`} />
+          <Avatar
+            src={`${baseURL}${img}`}
+            onClick={() => redirectToProfile(id)}
+          />
         </IconButton>
 
         <Typography
@@ -36,6 +45,10 @@ function AvatarSection({ name, created_at, img }) {
           fontFamily={"sans-serif"}
           letterSpacing={1}
           fontSize={15}
+          onClick={() => redirectToProfile(id)}
+          sx={{
+            cursor: "pointer",
+          }}
         >
           {name}
         </Typography>

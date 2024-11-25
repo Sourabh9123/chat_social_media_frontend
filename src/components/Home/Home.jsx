@@ -36,6 +36,7 @@ function Home() {
       <Stack direction={"row"} spacing={2} width={"100%"} p={2}>
         <Stack
           // direction={"column"}
+          id="scrollableDiv"
           spacing={1}
           width={"60%"}
           p={2}

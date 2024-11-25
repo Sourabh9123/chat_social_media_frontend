@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { clearOldComments, getAllComment } from "../../store/PostCommentSlice";
 import {
   Modal,
   Box,
@@ -12,7 +13,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { editComment } from "../../store/PostCommentSlice";
 import { fetchPost } from "../../store/PostSlice";
 
-function EditComment({ commentId, commentText }) {
+function EditComment({ commentId, commentText, postId }) {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   console.log({ commentId, commentText });
@@ -26,18 +27,21 @@ function EditComment({ commentId, commentText }) {
     setEditedText(e.target.value); // Update the state as user types
   };
 
-  const handleSave = (comment_id) => {
+  const handleSave = async (comment_id) => {
     // You can call an API or dispatch an action here to save the edited comment
     console.log(commentId);
     console.log("Edited comment text:", editedText);
 
-    dispatch(
+    await dispatch(
       editComment({
         comment_data: { text: editedText },
         comment_id: comment_id,
       })
     );
-    dispatch(fetchPost());
+    await dispatch(clearOldComments());
+    await dispatch(getAllComment(postId));
+
+    // dispatch(fetchPost());
     handleClose(); // Close the modal after saving
   };
 

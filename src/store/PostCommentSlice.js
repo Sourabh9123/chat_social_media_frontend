@@ -94,7 +94,7 @@ export const createComment = createAsyncThunk(
     try {
       const response = await axios.post(url, data, { headers }); // Use axios.post instead of axios.Post
       // return { data: response.data, statusCode: response.status };
-      return response.data;
+      return await response.data;
     } catch (error) {
       console.error(error);
       return rejectWithValue(error.response.data); // Use rejectWithValue to return errors
@@ -105,7 +105,11 @@ export const createComment = createAsyncThunk(
 const PostCommentsSlice = createSlice({
   name: "PostCommentsSlice",
   initialState,
-  reducers: {},
+  reducers: {
+    clearOldComments: (state) => {
+      state.data = {};
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getAllComment.pending, (state) => {
       state.is_error = false;
@@ -142,7 +146,18 @@ const PostCommentsSlice = createSlice({
       state.status = "failed";
       state.error = action.payload;
     });
+    builder.addCase(createComment.pending, (state) => {
+      state.status = "loading";
+    });
+    builder.addCase(createComment.fulfilled, (state, action) => {
+      state.status = "succeeded";
+    });
+    builder.addCase(createComment.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
+    });
   },
 });
 
 export default PostCommentsSlice.reducer;
+export const { clearOldComments } = PostCommentsSlice.actions;

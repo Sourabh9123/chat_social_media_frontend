@@ -1,0 +1,32 @@
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setWebSocket, closeWebSocket } from './websocketSlice';
+
+const WebSocketInitializer = () => {
+    const dispatch = useDispatch();
+    const socket = useSelector((state) => state.websocket.socket);
+
+    useEffect(() => {
+        // Check if WebSocket already exists to avoid reconnecting
+        if (!socket) {
+            const ws = new WebSocket('ws://your-websocket-url');
+            dispatch(setWebSocket(ws));
+
+            // Optional: Add event listeners for open, message, error, close
+            ws.onopen = () => console.log('WebSocket connection opened');
+            ws.onmessage = (message) => console.log('Received message:', message.data);
+            ws.onerror = (error) => console.error('WebSocket error:', error);
+            ws.onclose = () => console.log('WebSocket connection closed');
+
+            // Clean up WebSocket on component unmount
+            return () => {
+                ws.close();
+                dispatch(closeWebSocket());
+            };
+        }
+    }, [dispatch, socket]);
+
+    return null; // This component is only for setting up the WebSocket
+};
+
+export default WebSocketInitializer;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   Stack,
@@ -11,6 +11,9 @@ import {
 import UserProfileDetails from "./UserProfileDetails";
 
 function ProfilePosts() {
+  useEffect(() => {
+    console.log("need to get all post from user");
+  }, []);
   const handleClick = (id) => {
     console.log(id);
   };

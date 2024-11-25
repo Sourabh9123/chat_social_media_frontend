@@ -61,6 +61,10 @@ function Header() {
     console.log("profile clicked");
   };
 
+  const redirectToChat = () => {
+    navigate("/chatSection");
+  };
+
   return (
     <Stack
       direction="row"
@@ -194,7 +198,7 @@ function Header() {
           </Badge>
         </IconButton>
         <IconButton
-          onClick={() => console.log(" chat  clicked")}
+          onClick={redirectToChat}
           color="primary"
           sx={{
             width: "20px",

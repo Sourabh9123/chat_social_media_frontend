@@ -11,6 +11,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
+
 import EditComment from "./CommentEdit";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -24,19 +25,23 @@ import {
   fetchPost,
   DeleteComment,
   savedPost,
+  cleanOldPosts,
+  decreaseNoOfComments,
+  increaseNoOfComments,
 } from "../../store/PostSlice";
 import EditIcon from "@mui/icons-material/Edit";
 import BookmarkAddedIcon from "@mui/icons-material/BookmarkAdded";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import CommentDrawer from "./CommentDrawer";
-import { getAllComment } from "../../store/PostCommentSlice";
+import { getAllComment, clearOldComments } from "../../store/PostCommentSlice";
+// import { decreaseNoOfComments } from "../../store/PostSlice";
 
 function ActionButtons({
   total_likes,
   liked_by,
   total_comments,
-  comments,
+  // comments,
   post_id,
   liked_by_me,
   saved_post,
@@ -51,6 +56,7 @@ function ActionButtons({
   const [likeCount, setLikeCount] = useState(total_likes); // Store total likes in local state
   const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state
   const [newComment, setNewComment] = useState(""); // New comment state
+  const comments = useSelector((state) => state.comment.data);
 
   const handleHeartClick = async () => {
     const response = await dispatch(createOrRemoveLike(post_id));
@@ -65,9 +71,13 @@ function ActionButtons({
   };
 
   const handleDeleteComment = async (id) => {
-    const response = await dispatch(DeleteComment(id));
+    const response = await dispatch(DeleteComment(id)); // this deleteing comment
+    await dispatch(getAllComment(post_id));
+    // total_comments = total_comments - 1;
+    //  dispatch(deleteComment(post_id));
+    await dispatch(decreaseNoOfComments({ post_id })); // this is decreasing no of comments
     if (response.payload.status === 204) {
-      dispatch(fetchPost());
+      dispatch(getAllComment(post_id));
     }
   };
 
@@ -79,28 +89,46 @@ function ActionButtons({
   };
 
   const handleEditComment = (id) => {
-    console.log(id);
+    console.log(id, " edit comments-------------------");
+    dispatch(getAllComment(post_id));
   };
+  useEffect(() => {
+    // dispatch( )
+    // dispatch(getAllComment(post_id));
+  }, []);
 
-  const handleCommentClick = () => {
+  const handleCommentClick = async () => {
     setDrawerOpen(true); // Open the drawer when comment icon is clicked
+    // here to dispatch for comments
+    await dispatch(clearOldComments());
+
+    await dispatch(getAllComment(post_id));
   };
 
   const closeDrawer = () => {
     setDrawerOpen(false); // Close the drawer
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (newComment.trim()) {
-      console.log("New comment added:", newComment);
-      console.log("New comment added:", post_id);
+      // console.log("New comment added:", newComment);
+      // console.log("New comment added:", post_id);
       //comment_data
       const comment_data = {
         text: newComment,
       };
-      const response = dispatch(createComment({ comment_data, post_id }));
-      console.log(response);
-      dispatch(fetchPost());
+      const response = await dispatch(createComment({ comment_data, post_id }));
+      await dispatch(increaseNoOfComments({ post_id }));
+      // console.log(
+      //   response,
+      //   "--------------------------------respone of comment"
+      // );
+      // console.log("cleaning up ...");
+      await dispatch(clearOldComments());
+      await dispatch(getAllComment(post_id));
+      // console.log("fetching post ...");
+      // dispatch(fetchPost());
+      // console.log(" posts fatched ...");
 
       setNewComment(""); // Clear input after submitting
     }
@@ -262,6 +290,7 @@ function ActionButtons({
                           <EditComment
                             commentId={comment.id}
                             commentText={comment.text}
+                            postId={post_id}
                           />
                           <IconButton
                             sx={{

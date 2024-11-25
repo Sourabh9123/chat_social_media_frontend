@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePosts from "./components/CreateProfile/ProfilePosts";
 import SignUp from "./components/signUp/SignUp";
 import OtherUserProfile from "./components/CreateProfile/OtherUserProfile";
+import ChatSection from "./components/compo/ChatSection";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,6 +44,14 @@ const router = createBrowserRouter(
           element={
             <ProtectedRoute>
               <OtherUserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chatsection"
+          element={
+            <ProtectedRoute>
+              <ChatSection />
             </ProtectedRoute>
           }
         />
