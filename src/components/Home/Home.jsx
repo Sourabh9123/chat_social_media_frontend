@@ -13,6 +13,14 @@ function Home() {
   // const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useDispatch();
+  const webSocket = useSelector((state) => state.webSocket.instance);
+
+  useEffect(() => {
+    if (!webSocket) {
+      dispatch(initializeWebSocket());
+      console.log("websocket trying to connect");
+    }
+  }, [dispatch, webSocket]);
   useEffect(() => {
     const getProfileSuggestions = async () => {
       const page_no = 1;

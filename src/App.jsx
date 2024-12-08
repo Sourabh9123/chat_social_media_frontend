@@ -16,7 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePosts from "./components/CreateProfile/ProfilePosts";
 import SignUp from "./components/signUp/SignUp";
 import OtherUserProfile from "./components/CreateProfile/OtherUserProfile";
-import ChatSection from "./components/compo/ChatSection";
+import ChatSection from "../src/components/Chat/ChatSection";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

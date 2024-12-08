@@ -23,6 +23,8 @@ function Header() {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  // console.log(BASE_URL, " -base url ------------------");
 
   const callSearch = () => {
     dispatch(setSearchTerm(search));

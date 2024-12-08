@@ -11,6 +11,20 @@ const initialState = {
   is_error: null,
 };
 
+export const getUserDataByToken = createAsyncThunk(
+  "getUserDataByToken",
+  async (token) => {
+    try {
+      const url = `http://127.0.0.1:8000/auth/details/${token}/`;
+      const response = await axios.get(url);
+      return await response.data;
+    } catch (error) {
+      console.log(error);
+      return await response.data;
+    }
+  }
+);
+
 export const createUser = createAsyncThunk("createUser", async (data) => {
   try {
     const url = "http://127.0.0.1:8000/auth/signup/";
@@ -63,6 +77,7 @@ const authSlice = createSlice({
       state.username = action.payload.user_data.username;
       state.user_id = action.payload.user_data.id;
       state.profile_picture = action.payload.user_data.profile_picture;
+      localStorage.setItem("token", state.access_token);
     });
     builder.addCase(LoginUser.rejected, (state, action) => {
       state.status = "error";
@@ -84,6 +99,25 @@ const authSlice = createSlice({
       state.status = "error";
       state.is_error = true;
     });
+    builder.addCase(getUserDataByToken.fulfilled, (state, action) => {
+      if (action.payload.data !== "failed") {
+        state.status = "success";
+        state.access_token = action.payload.data.token.access;
+        state.refresh_token = action.payload.data.token.refresh;
+        state.username = action.payload.data.username;
+        state.user_id = action.payload.data.id;
+        state.profile_picture = action.payload.data.profile_picture;
+      } else {
+        console.log(
+          "data from getUserbyToken data failed ----------",
+          action.payload
+        );
+      }
+
+      // console.log(action.payload.data.token.access);
+    });
+    builder.addCase(getUserDataByToken.pending, (state, action) => {});
+    builder.addCase(getUserDataByToken.rejected, (state, action) => {});
   },
 });
 

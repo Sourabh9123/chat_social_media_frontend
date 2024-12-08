@@ -10,7 +10,7 @@ export const initializeWebSocket = createAsyncThunk(
   "webSocket/initializeWebSocket",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const ws = new WebSocket("ws://your-websocket-url");
+      const ws = new WebSocket("ws://localhost/ws/chat/");
 
       ws.onopen = () => {
         dispatch(setConnectionStatus(true));
@@ -24,6 +24,7 @@ export const initializeWebSocket = createAsyncThunk(
       ws.onmessage = (event) => {
         const message = JSON.parse(event.data);
         // Handle incoming messages by dispatching actions here, if required
+        console.log(message);
       };
 
       return ws; // Return WebSocket instance as payload

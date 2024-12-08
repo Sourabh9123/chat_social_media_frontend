@@ -6,6 +6,7 @@ import userRelatedSlice from "./userRelatedSlice";
 import PostCommentsSlice from "./PostCommentSlice";
 import FollowSlice from "./FollowSlice";
 import suggestionSlice from "./suggestionSlice";
+import ChatWebSocketSlice from "./WebsocketChatSlice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     userRelated: userRelatedSlice,
     follow: FollowSlice,
     suggestion: suggestionSlice,
+    webSocket: ChatWebSocketSlice,
   },
 });
 
