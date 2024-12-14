@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getSuggestion } from "../../store/suggestionSlice";
 import PaginationComponent from "../compo/PaginationComponent";
+import { initializeWebSocket } from "../../store/WebsocketChatSlice";
 import { v4 as uuidv4 } from "uuid";
 function Home() {
   const { suggestions, count, next, previous } = useSelector(
@@ -13,14 +14,34 @@ function Home() {
   // const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useDispatch();
-  const webSocket = useSelector((state) => state.webSocket.instance);
+  // const webSocket = useSelector((state) => state.webSocket.instance);
+  const [socket, setSocket] = useState(null);
+  const access_token = useSelector((state) => state.auth.access_token);
 
   useEffect(() => {
-    if (!webSocket) {
-      dispatch(initializeWebSocket());
-      console.log("websocket trying to connect");
+    if (access_token) {
+      const ws = new WebSocket(
+        `ws://127.0.0.1:8000/ws/chat/?token=${access_token}`
+      );
+      ws.onopen = () => {
+        console.log("connection Estiblished");
+      };
+      ws.onclose = () => {
+        console.log("connection closed");
+      };
+      ws.onmessage = (event) => {
+        console.log("message received ", JSON.parse(event.data));
+      };
+      setSocket(ws);
     }
-  }, [dispatch, webSocket]);
+  }, [access_token]);
+
+  // useEffect(() => {
+  //   if (!webSocket) {
+  //     dispatch(initializeWebSocket());
+  //     console.log("websocket trying to connect");
+  //   }
+  // }, [dispatch, webSocket]);
   useEffect(() => {
     const getProfileSuggestions = async () => {
       const page_no = 1;
@@ -104,7 +125,7 @@ function Home() {
           /> */}
 
           <PaginationComponent
-            count={count}
+            count={count ?? 0}
             // next={next}
             // previous={previous}
             // suggestions={suggestions}

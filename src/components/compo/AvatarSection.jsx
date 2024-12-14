@@ -33,11 +33,9 @@ function AvatarSection({ name, created_at, img, id }) {
             width: 40,
             height: 40,
           }}
+          onClick={() => redirectToProfile(id)}
         >
-          <Avatar
-            src={`${baseURL}${img}`}
-            onClick={() => redirectToProfile(id)}
-          />
+          <Avatar src={`${baseURL}${img}`} />
         </IconButton>
 
         <Typography

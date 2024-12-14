@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSuggestion } from "../../store/suggestionSlice";
 
 function PaginationComponent({ count }) {
+  // console.log(count ?? 0, " ----------------------------------------");
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);

@@ -1,8 +1,19 @@
 import { Stack, Typography, Box } from "@mui/material";
-import React from "react";
+import { useEffect } from "react";
 import IndividualChatIcons from "./IndividualChatIcons";
-
+// import  {getPreviousChats}  from "../../"
+import { useSelector, useDispatch } from "react-redux";
+import { getPreviousChats } from "../../store/UserPreviousChatSlice";
 function LeftChatBar() {
+  const dispatch = useDispatch();
+  const chat_data = useSelector((state) => state.userpreviousChats.data);
+  const getchats = async () => {
+    await dispatch(getPreviousChats());
+  };
+  useEffect(() => {
+    getchats();
+    console.log("use effect ..... ", chat_data);
+  }, [dispatch, chat_data]);
   return (
     <>
       <Stack bgcolor={"#34b7eb"}>
@@ -54,7 +65,14 @@ function LeftChatBar() {
               },
             }}
           >
-            <IndividualChatIcons />
+            {/* {chat_data.length > 0 ? (
+              chat_data.map((item) => (
+                <IndividualChatIcons key={item.id} data={item} />
+              ))
+            ) : (
+              <p>No chats available</p>
+            )} */}
+
             <IndividualChatIcons />
             <IndividualChatIcons />
             <IndividualChatIcons />

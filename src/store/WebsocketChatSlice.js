@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-initialState = {
+const initialState = {
   instance: null,
   isConnected: false,
   error: null,
@@ -8,16 +8,32 @@ initialState = {
 
 export const initializeWebSocket = createAsyncThunk(
   "webSocket/initializeWebSocket",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue, getState }) => {
     try {
-      const ws = new WebSocket("ws://localhost/ws/chat/");
+      const state = getState();
+      const access_token = state.auth.access_token;
+      const ws = new WebSocket(
+        `ws://127.0.0.1:8000/ws/chat/?token=${access_token}`
+      );
 
       ws.onopen = () => {
-        dispatch(setConnectionStatus(true));
+        // dispatch(setConnectionStatus(true));
+        console.log("on open");
       };
 
       ws.onclose = () => {
-        dispatch(setConnectionStatus(false));
+        // dispatch(setConnectionStatus(false));
+      };
+
+      const sendMessage = async (ws) => {
+        const message = {
+          type: "chat_message",
+          message: "testing message",
+          sender: "123id",
+          receiver: "321id",
+        };
+        console.log(JSON.stringify(message), " ------------------------------");
+        ws.send(JSON.stringify(message));
       };
 
       // Dispatch actions for messages if needed
@@ -36,24 +52,21 @@ export const initializeWebSocket = createAsyncThunk(
 
 const ChatWebSocketSlice = createSlice({
   name: "webSocket",
-  initialState: {
-    instance: null,
-    isConnected: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     setConnectionStatus: (state, action) => {
-      state.isConnected = action.payload;
+      // state.isConnected = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(initializeWebSocket.fulfilled, (state, action) => {
-        state.instance = action.payload;
+        // state.instance = action.payload;
+        console.log("fullfeild ...");
         state.error = null;
       })
       .addCase(initializeWebSocket.rejected, (state, action) => {
-        state.error = action.payload;
+        // state.error = action.payload;
       });
   },
 });
